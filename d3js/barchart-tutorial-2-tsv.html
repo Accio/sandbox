@@ -28,8 +28,6 @@ var chart = d3.select(".chart")
 
 d3.tsv("http://127.0.0.1/home/data/barchart-data.tsv",
 	 type, function(error, data) {
-  console.log(data);
-
   myscale.domain([0, d3.max(data, function(d) {return d.value;})]);
   
   chart.attr("height", barHeight*data.length);
