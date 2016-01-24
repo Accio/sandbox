@@ -13,7 +13,7 @@
 }
 
 </style>
-<h1>Barchart example using svg</h1>
+<h1>Barchart example using svg and tsv file</h1>
 <svg class="chart"></svg>
 <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
 <script>
@@ -26,7 +26,7 @@ var myscale = d3.scale.linear()
 var chart = d3.select(".chart")
 		.attr("width", width)
 
-d3.tsv("http://localhost/home/data/barchart-data.tsv",
+d3.tsv("http://127.0.0.1/home/data/barchart-data.tsv",
 	 type, function(error, data) {
   console.log(data);
 
