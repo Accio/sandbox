@@ -2,14 +2,12 @@
 <meta charset="utf-8">
 <style>
 
-.chart rect {
+.bar {
   fill: steelblue;
 }
 
-.chart text {
-  fill: white
-  font: 10px sans-serif;
-  text-anchor: middle;
+.bar:hover {
+  fill: brown;
 }
 
 .axis text {
@@ -62,6 +60,8 @@
 
   d3.tsv("http://127.0.0.1/home/data/barchart-data.tsv",
 	 type, function(error, data) {
+    if (error) throw error;
+
     x.domain(data.map(function(d) {return d.name;}));
     y.domain([0, d3.max(data, function(d) {return d.value;})]);
 
