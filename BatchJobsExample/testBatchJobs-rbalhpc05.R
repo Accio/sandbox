@@ -13,7 +13,7 @@ f <- function(x) {
 y <- lapply(5:14, FUN=function(x) try(f(x)))
 str(y)
 
-loadConfig()
+loadConfig(".BatchJobs-rbalhpc05.R")
 
 ## setup a BatchJob registration
 
