@@ -1,6 +1,6 @@
 Troubleshoorting for reading tsv in R
 ===
-[Jitao David Zhang](mailto:jitao_david.zhang@roche.com)
+[Jitao David Zhang](mailto:jitao_david.zhang@roche.com), Jan 26. 2018
 
 A minimal example of how to read tsv files in which a column contains inconsistent data types.
 
