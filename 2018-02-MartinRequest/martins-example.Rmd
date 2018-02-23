@@ -1,0 +1,89 @@
+---
+title: "An minimal example for Martin"
+date: "`r Sys.Date()`"
+author: Jitao David Zhang <jitao_david.zhang@roche.com>
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE)
+```
+
+```{r}
+library(ribiosUtils)
+library(ribiosPlot)
+library(ggplot2)
+library(viridis)
+library(scales)
+library(ggthemes)
+library(knitr)
+```
+
+## Background
+
+In this document, I develop a minimal example to explain my ideas about testing a small set of geneset for enrichment of genesets.
+
+## A list of genes with statistics
+
+Suppose we have twelve genes with given log2 fold changes (logFC) between condition one and condition two.
+
+```{r inputData, fig.width=3, fig.height=4}
+set.seed(100)
+df <- data.frame(Gene=sprintf("Gene%2d",1:12),
+                 logFC=sort(rnorm(12, 0, 3), decreasing=TRUE))
+biosHeatmap(matrix(df$logFC), dendrogram="none", Rowv=FALSE, Colv=FALSE, labRow=df$Gene, lwid=c(1,1), lhei=c(1,3),
+            col="royalbluered",
+            cellnote=matrix(round(df$logFC,2)), notecol="orange", color.key.title = "logFC")
+```
+
+## Three genesets
+
+And now we suppose we have three genesets, A, B, and C, with following compositions:
+* geneset A consists of mostly positively regulated genes;
+* geneset B consists of randomly selected genes;
+* geneset C consists of mostly negatively regulated genes.
+
+```{r gs, fig.width=3, fig.height=4}
+genesetA <- c(rep(1,6), rep(0,6))
+genesetB <- rep(0, 12); genesetB[sample(1:12, 6)] <- 1
+genesetC <- c(rep(0,6), rep(1,6))
+genesets <- cbind(genesetA, genesetB, genesetC)
+rownames(genesets) <- df$Gene
+biosHeatmap(genesets, dendrogram="none", Rowv=FALSE, Colv=FALSE, labRow=df$Gene, lwid=c(1,1), lhei=c(1,3),
+            col="blackyellow", colsep = 1:(ncol(genesets)-1),
+            color.key.title = "Membership")
+```
+
+## Statistical tests
+
+Now, for all genesets, we can apply Student's t-test, or Wilcoxon's t-test, to determine whether the geneset is enriched of either positively regulated or negatively regulated genes.
+
+We report the results of the statistic tests in **Enrichment Scores**, which are defined as absolute log10-transformed p-values multiplied by the sign of difference. If the score is positive, then the geneset is enriched of positively regulated genes; otherwise it is enriched of negatively regulated genes. A score larger than 2 corresponds to an enrichment of positively regulated genes with p-value smaller than 0.01, and a score smaller than -2 corresponds to an enrichment of negatively regulated genes with p-value smaller than 0.01.
+
+```{r enrich}
+gsTstat <- function(stat, membership) {
+  statPos <- stat[membership==1]
+  statNeg <- stat[membership==0]
+  tRes <- t.test(statPos, statNeg)
+  es <- pScore(tRes$p.value, sign(tRes$statistic))
+  return(es)
+}
+gsWilstat <- function(stat, membership) {
+  statPos <- stat[membership==1]
+  statNeg <- stat[membership==0]
+  wRes <- wilcox.test(statPos, statNeg)
+  es <- pScore(wRes$p.value, sign(median(statPos) - median(statNeg)))
+  return(es)
+}
+tRes <- apply(genesets, 2, function(gsMem) gsTstat(df$logFC, gsMem))
+wRes <- apply(genesets, 2, function(gsMem) gsWilstat(df$logFC, gsMem))
+resDf <- data.frame(TstatResult=tRes,
+                    WilconResult=wRes)
+kable(resDf)
+```
+
+As expected, geneset A and C are enriched of positively and negatively regulated genes, respectively, while B is not significantly enriched of either type (assuming that the statistical significance is set as 0.01).
+
+## Conclusion
+
+I hope this minimal example explains my idea.
