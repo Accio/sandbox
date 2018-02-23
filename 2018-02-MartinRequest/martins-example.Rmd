@@ -6,26 +6,23 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, message=FALSE)
-```
-
-```{r}
-library(ribiosUtils)
-library(ribiosPlot)
-library(ggplot2)
-library(viridis)
-library(scales)
-library(ggthemes)
-library(knitr)
+knitr::opts_chunk$set(echo = TRUE, message=FALSE)
 ```
 
 ## Background
 
 In this document, I develop a minimal example to explain my ideas about testing a small set of geneset for enrichment of genesets.
 
+
+```{r}
+library(ribiosUtils)
+library(ribiosPlot)
+library(knitr)
+```
+
 ## A list of genes with statistics
 
-Suppose we have twelve genes with given log2 fold changes (logFC) between condition one and condition two.
+Suppose we have twelve genes with given log2 fold changes (logFC) between condition one and condition two. For the sake of simplicity, the genes are sorted by the logFC value in the descending order.
 
 ```{r inputData, fig.width=3, fig.height=4}
 set.seed(100)
@@ -39,6 +36,7 @@ biosHeatmap(matrix(df$logFC), dendrogram="none", Rowv=FALSE, Colv=FALSE, labRow=
 ## Three genesets
 
 And now we suppose we have three genesets, A, B, and C, with following compositions:
+
 * geneset A consists of mostly positively regulated genes;
 * geneset B consists of randomly selected genes;
 * geneset C consists of mostly negatively regulated genes.
