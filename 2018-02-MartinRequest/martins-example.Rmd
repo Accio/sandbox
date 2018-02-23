@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE, message=FALSE)
 
 ## Background
 
-In this document, I develop a minimal example to explain my ideas about testing a small set of geneset for enrichment of genesets.
+In this document, I develop a minimal example to explain my thoughts about testing potential enrichment of a collection of genesets in a small set of genes.
 
 
 ```{r}
@@ -55,6 +55,8 @@ biosHeatmap(genesets, dendrogram="none", Rowv=FALSE, Colv=FALSE, labRow=df$Gene,
 ## Statistical tests
 
 Now, for all genesets, we can apply Student's t-test, or Wilcoxon's t-test, to determine whether the geneset is enriched of either positively regulated or negatively regulated genes.
+
+The statistical tests has the null hypothesis that *the statistic associated with the genes that belong to the pathway have the same mean (median) value as the values associated with the genes that do not belong to the pathway*. The alternative hypothesis is that *the statistic associated with the genes that belong to the pathway have a different mean (median) value as the values associated with the genes that do not belong to the pathway*.
 
 We report the results of the statistic tests in **Enrichment Scores**, which are defined as absolute log10-transformed p-values multiplied by the sign of difference. If the score is positive, then the geneset is enriched of positively regulated genes; otherwise it is enriched of negatively regulated genes. A score larger than 2 corresponds to an enrichment of positively regulated genes with p-value smaller than 0.01, and a score smaller than -2 corresponds to an enrichment of negatively regulated genes with p-value smaller than 0.01.
 
