@@ -1,0 +1,23 @@
+---
+title: "Chapter 7 (pharmacokinetics) exercise"
+author: Jitao David Zhang
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+```
+
+
+```{r}
+pkData <- data.frame(time=1:5,
+                     Cp=c(75, 55, 41, 30, 22))
+
+pkModel <- lm(log(Cp)~time, data=pkData)
+(kel <- -coef(pkModel)[2])
+(Cp0 <- exp(coef(pkModel)[1]))
+(tHalf <- log(2)/kel)
+```
+
+
