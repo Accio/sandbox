@@ -57,7 +57,8 @@ kel <- -coef(lastLm)[2]
 
 ```{r aucRefactor}
 aucTrapezoids <- function(aucData) {
-  if(nrow(aucData)<=2)
+  stopifnot(all(c("time", "Cp") %in% colnames(aucData)))
+  if(nrow(aucData)<=2) 
     stop("At least three points needed")
   ## from second to the last
   firstLm <- with(aucData[1:2,],
@@ -83,4 +84,14 @@ aucTrapezoids <- function(aucData) {
 sum(aucTrapezoids(aucData))
 ```
 
+```{r vd}
+vdData <- data.frame(time=c(1,2,3,4,5),
+                     Cp=c(21, 13, 8, 5, 3))
+dose <- 1000
+vdModel <- lm(log(Cp)~time, data=vdData)
+## (kel <- -coef(vdModel)[2])
+(Cp0 <- exp(coef(vdModel)[1]))
+(vd <- dose/Cp0)
+## (tHalf <- log(2)/kel)
+```
 
