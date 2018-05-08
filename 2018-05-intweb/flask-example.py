@@ -1,5 +1,6 @@
 from flask import Flask
 from flask import render_template
+from flask import jsonify
 from flask_sqlalchemy import SQLAlchemy
 import sqlite3
 from sqlalchemy import Column, Date, String, Integer
@@ -51,3 +52,8 @@ class Todos(db.Model):
 def display():
     return render_template('dbdisplay.html',
             todos = Todos.query.all())
+
+@webapp.route('/api/all')
+def app_all():
+    todos = Todos.query.all()
+    return jsonify(json_list = [todo.serialize for todo in todos])
