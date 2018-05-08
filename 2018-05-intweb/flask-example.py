@@ -1,8 +1,11 @@
 from flask import Flask
 from flask import render_template
+from flask_sqlalchemy import SQLAlchemy
 import sqlite3
+from sqlalchemy import Column, Date, String, Integer
 
 webapp = Flask(__name__)
+webapp.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.sqlite3'
 
 @webapp.route("/")
 def home():
@@ -21,3 +24,30 @@ def show_alla_todos():
     cur = db.execute('SELECT * FROM todoTbl')
     rows = cur.fetchall()
     return render_template('todos.html', rows = rows);
+
+db = SQLAlchemy(webapp)
+
+class Todos(db.Model):
+    __tablename__ = 'todoTbl'
+    id = Column(Integer, primary_key=True)
+    date = Column(Date)
+    name = Column(String)
+    deadline = Column(Date)
+
+    def __init__(self, date, name, deadline):
+        self.date = date
+        self.name = name
+        self.deadline = deadline
+
+    @property
+    def serialize(self):
+        '''return as a json object so that we can use it in RESTful API'''
+        return {'id': self.id,
+                'date': self.date.strftime('%Y-%m-%d'),
+                'name': self.name,
+                'deadline': self.date.strftime('%Y-%m-%d')}
+
+@webapp.route('/dbdisplay')
+def display():
+    return render_template('dbdisplay.html',
+            todos = Todos.query.all())
