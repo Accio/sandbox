@@ -1,4 +1,5 @@
 from flask import Flask
+from flask import render_template
 
 webapp = Flask(__name__)
 
@@ -10,18 +11,6 @@ def home():
 def user():
     user_dict = {'first': 'Jitao David', 'last': 'Zhang', 'email': 'jitao_david.zhang@roche.com'}
 
-    html = """
-    <dl>
-      <dt>first name</dt>
-      <dd>{first}</dd>
-      <dt>Last name</dt>
-      <dd>{last}</dd>
-      <dt>E-mail</dt>
-      <dd>{email}</dd>
-    </dl>
-    """.format(**user_dict)
-
-    return html
-
+    return render_template("user.html", user=user_dict)
 
 	
