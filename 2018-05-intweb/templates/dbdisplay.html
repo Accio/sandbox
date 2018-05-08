@@ -1,0 +1,17 @@
+
+{% block title %} My Todos {% endblock %}
+
+{% block content %}
+
+<dl>
+  {% for todo in todos %}
+   <!-- use .iteritems() in python2 -->
+  <ll> ID: {{ todo.id }}
+    <li> Task: {{ todo.name }} </li>
+    <li> Created: {{ todo.date }} </li>
+    <li> Deadline: {{ todo.deadline }} </li>
+
+  {% endfor %}
+</dl>
+
+{% endblock %}
