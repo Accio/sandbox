@@ -1,0 +1,14 @@
+
+{% block title %} User's Page {% endblock %}
+
+{% block content %}
+
+<dl>
+  {% for key,value in user.items() %}
+   <!-- use .iteritems() in python2 -->
+  <dt> {{ key }} </dt>
+  <dd> {{ value }} </dd>
+  {% endfor %}
+</dl>
+
+{% endblock %}
