@@ -10,7 +10,12 @@ webapp.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///todo.sqlite3'
 
 @webapp.route("/")
 def home():
-    return ("<h1>Hello</h1>")
+    html = """
+    <h1>Hello, this is an experimental page</h1>
+    <p> Subpage <a href="/user">user</a> </p>
+    <p> Subpage <a href="/todo/all">all todos</a> </p>
+    """
+    return (html)
 
 @webapp.route("/user")
 def user():
