@@ -14,8 +14,22 @@ def home():
     <h1>Hello, this is an experimental page</h1>
     <p> Subpage <a href="/user">user</a> </p>
     <p> Subpage <a href="/todo/all">all todos</a> </p>
+    <p> Subpage <a href="/user/AnyUser">User profile for 'AnyUser'</a> </p>
+    <p> Subpage <a href="/study/3">Study profile of study_id=3</a> </p>
     """
     return (html)
+
+""" viable routes """
+
+@webapp.route('/user/<username>')
+def show_user_profile(username):
+    # show user's profile
+    return 'User %s' % username
+
+@webapp.route('/study/<int:study_id>')
+    # show information of a study
+def show_study_profile(study_id):
+   return 'Study %d' % study_id
 
 @webapp.route("/user")
 def user():
