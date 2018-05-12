@@ -19,7 +19,7 @@ def app():
 
     with app.app_context():
         init_db()
-        get_db().executescript(_data_sql‘）
+        get_db().executescript(_data_sql)
 
     yield app
 
@@ -33,3 +33,22 @@ def client(app):
 @pytest.fixture
 def runner(app):
     return app.test_cli_runner()
+
+## authentication
+class AuthActions(object):
+    def __init__(self, client):
+        self._client = client
+
+    def login(self, username='test', password='test'):
+        return self._client.post(
+            '/auth/login',
+            data={'username': username, 'password': password}
+        )
+
+    def logout(self):
+        return self._client.get('/auth/logout')
+
+
+@pytest.fixture
+def auth(client):
+    return AuthActions(client)
