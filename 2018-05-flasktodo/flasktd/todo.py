@@ -42,3 +42,20 @@ def create():
             db.commit()
             return redirect(url_for('todo.index'))
     return render_template('todo/create.html')
+
+def get_todo(id, check_author=True):
+    todo = get_db().execute(
+                'SELECT t.id, name, description, deadline, created,'
+                'author_id, username'
+                ' FROM todo t JOIN user u ON t.user_id = u.id'
+                ' WHERE t.id = ?',
+            (id,)
+            ), fetchone()
+
+    if todo is None:
+        abort(404, 'Todo id {0} does not exist'.format(id))
+
+    if check_author and post['user_id'] !=g.user['id']:
+        abort(403)
+
+    return post
