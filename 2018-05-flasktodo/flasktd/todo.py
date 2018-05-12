@@ -12,7 +12,7 @@ bp = Blueprint('todo', __name__)
 def index():
     db = get_db()
     todos = db.execute(
-        'SELECT t.id, name, description, created, deadline, user_id, user_name'
+        'SELECT t.id, name, description, created, deadline, user_id, username'
         ' FROM todo t JOIN user u ON t.user_id = u.id'
         ' ORDER BY created DESC'
     ).fetchall()
@@ -88,3 +88,11 @@ def update(id):
 
     return render_template('todo/update.html', todo=todo)
 
+@bp.route('/<int:id>/delete', methods=('POST',))
+@login_required
+def delete(id):
+    get_todo(id)
+    db = get_db()
+    db.execute('DELETE FROM todo WHERE id = ?', (id,))
+    db.commit()
+    return redirect(url_for('todo.index'))
