@@ -14,7 +14,7 @@
 	  <h1>{{ todo['name'] }}</h1>
 	  <div class="about">
 		  by {{ todo['username'] }}
-		  on {{ todo['created'].strftime('%Y-%m-%d') }}
+		  on {{ todo['created'] }}
 	  </div>
 	  {% if g.user['id'] == todo['user_id'] %}
 	    <a class="action" 
@@ -23,7 +23,7 @@
 	  {% endif %}
 	</header>
 	<p class="body">{{ todo['description'] }}</p>
-	<p class="deadline">Deadline: {{ todo['deadline'].strftime('%Y-%m-%d') }}</p>
+	<p class="deadline">Deadline: {{ todo['deadline'] }}</p>
     <todoItem/>
     {% if not loop.last %}
       <hr>
