@@ -46,24 +46,24 @@ def create():
 def get_todo(id, check_author=True):
     todo = get_db().execute(
                 'SELECT t.id, name, description, deadline, created,'
-                'author_id, username'
+                'user_id, username'
                 ' FROM todo t JOIN user u ON t.user_id = u.id'
                 ' WHERE t.id = ?',
             (id,)
-            ), fetchone()
+            ).fetchone()
 
     if todo is None:
         abort(404, 'Todo id {0} does not exist'.format(id))
 
-    if check_author and post['user_id'] !=g.user['id']:
+    if check_author and todo['user_id'] !=g.user['id']:
         abort(403)
 
-    return post
+    return todo 
 
 @bp.route('/<int:id>/update', methods=('GET', 'POST'))
 @login_required
 def update(id):
-    post = get_post(id)
+    todo = get_todo(id)
 
     if request.method == 'POST':
         name = request.form['name']
