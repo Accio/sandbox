@@ -8,13 +8,14 @@
   <form method="post">
     <label for="name">Name</label>
     <input name="name" id="name" 
-      value="{{ request.form['name'] or post['name'] }}" required>
+      value="{{ request.form['name'] or todo['name'] }}" required>
     <label for="description">Description</label>
     <textarea name="description" id="description">
-	    {{ request.form['description'] or post['description'] }}
+	    {{ request.form['description'] or todo['description'] }}
       </textarea>
     <label for="deadline">Deadline</label>
-    <input name="deadline"  id="deadline" type="date">
+    <input name="deadline"  id="deadline" type="date"
+      value="{{ request.form['deadline'] or todo['deadline'] }}">
     <input type="submit" value="Save">
   </form>
   <form action="{{ url_for('todo.delete', id=todo['id']) }}" method="post">
