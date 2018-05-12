@@ -59,3 +59,32 @@ def get_todo(id, check_author=True):
         abort(403)
 
     return post
+
+@bp.route('/<int:id>/update', methods=('GET', 'POST'))
+@login_required
+def update(id):
+    post = get_post(id)
+
+    if request.method == 'POST':
+        name = request.form['name']
+        description = request.form['description']
+        deadline = request.form['deadline']
+        error = None
+
+        if not name:
+            error = 'Name is required.'
+
+        if error is not None:
+            flash(error)
+        else:
+            db = get_db()
+            db.execute(
+                'UPDATE todo SET name = ?, description = ?, deadline = ?'
+                ' WHERE id = ?',
+                (name, description, deadline, id)
+            )
+            db.commit()
+            return redirect(url_for('todo.index'))
+
+    return render_template('todo/update.html', todo=todo)
+
