@@ -3,7 +3,7 @@
 <title>{% block title %}{% endblock %} - Flasktd</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <nav>
-  <h1>Flasktd</h1>
+  <h1>咱们家的todo单</h1>
   <ul>
     {% if g.user %}
       <li><span>{{ g.user['username'] }}</span>
