@@ -18,3 +18,27 @@ def index():
     ).fetchall()
     return render_template('todo/index.html', todos=todos)
 
+@bp.route('/create', methods=('GET', 'POST'))
+@login_required
+def create():
+    if request.method == 'POST':
+        name = request.form['name']
+        description = request.form['description']
+        deadline = request.form['deadline']
+        error = None
+
+        if not name:
+            error = 'Name is required'
+
+        if error is not None:
+            flash(error)
+        else:
+            db = get_db()
+            db.execute(
+                    'INSERT INTO todo (name, description, deadline, user_id)'
+                    ' VALUES (?, ?, ?, ?)',
+                    (name, description, deadline, g.user['id'])
+            )
+            db.commit()
+            return redirect(url_for('todo.index'))
+    return render_template('todo/create.html')
