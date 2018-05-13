@@ -12,10 +12,7 @@
     <todoItem class="todo">
 	<header>
 	  <h1>{{ todo['name'] }}</h1>
-	  <div class="about">
-		  by {{ todo['username'] }}
-		  on {{ todo['created'] }}
-	  </div>
+	  <div class="about">by {{ todo['username'] }} on {{ todo['created'] }}</div>
 	  {% if g.user['id'] == todo['user_id'] %}
 	    <a class="action" 
 		href="{{ url_for('todo.update', id=todo['id']) }}">
