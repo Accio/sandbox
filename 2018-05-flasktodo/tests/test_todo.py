@@ -71,7 +71,7 @@ def test_update(client, auth, app):
         todo = db.execute('SELECT * FROM todo WHERE id = 1').fetchone()
         assert todo['name'] == 'updated'
         assert todo['description'] == 'new desc'
-        assert todo['deadline'] = '2018-06-01'
+        assert todo['deadline'] == '2018-06-01'
 
 @pytest.mark.parametrize('path', (
     '/create',
