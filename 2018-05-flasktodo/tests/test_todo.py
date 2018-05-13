@@ -73,3 +73,12 @@ def test_update(client, auth, app):
         assert todo['description'] == 'new desc'
         assert todo['deadline'] = '2018-06-01'
 
+@pytest.mark.parametrize('path', (
+    '/create',
+    '/1/update',
+))
+def test_create_update_validate(client, auth, path):
+    auth.login()
+    response = client.post(path, 
+            data={'name':'', 'description': '', 'deadline':''})
+    assert b'Name is required.' in response.data
