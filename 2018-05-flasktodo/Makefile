@@ -9,8 +9,9 @@ test:
 
 coverage:
 	coverage run -m pytest
+	coverage report
 
-coverage-report:
+coverage-report: coverage
 	coverage html
 	firefox ./htmlcov/index.html
 
