@@ -5,4 +5,4 @@ VALUES
 
 INSERT INTO todo (name, description, user_id, created, deadline)
 VALUES
-  ('test todo', 'test' || x'0a' || 'body', 1, '2018-01-01 00:00:00', '2018-05-12');
+  ('test todo', 'test' || x'0a' || 'description', 1, '2018-01-01 00:00:00', '2018-05-12');
