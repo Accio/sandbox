@@ -34,6 +34,7 @@ def test_login(client, auth):
     response = auth.login()
     assert response.headers['Location'] == 'http://localhost/'
 
+    # use `client` in a `with` block allows accessing context variables after the response is returned. Normally, accessing such variables outside of a request would raise an error.
     with client:
         client.get('/')
         assert session['user_id'] == 1
