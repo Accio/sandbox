@@ -6,3 +6,5 @@ init-db:
 
 test:
 	pytest
+
+.PHONY: test
