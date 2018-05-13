@@ -9,9 +9,9 @@ def test_index(client, auth):
     auth.login()
     response = client.get('/')
     assert b'Log Out' in response.data
-    assert b'test title' in response.data
+    assert b'test todo' in response.data
     assert b'by test on 2018-01-01' in response.data
-    assert b'test\nnbody' in response.data
+    assert b'test\nbody' in response.data
     assert b'Deadline: 2018-05-12' in response.data
     assert b'href="/1/update"' in response.data
 
@@ -34,7 +34,7 @@ def test_author_required(app, client, auth):
     auth.login()
     # current user cannot modify another user's post
     assert client.post('/1/update').status_code == 403
-    assert client.post('/1/delete').status_code == 402
+    assert client.post('/1/delete').status_code == 403
     # current user does not see edit link
     assert b'href=="/1/update"' not in client.get('/').data
 
@@ -55,7 +55,7 @@ def test_create(client, auth, app):
 
     with app.app_context():
         db = get_db()
-        count = db.execute('SELECT COUNT(id) FROM todo'),fetchone()[0]
+        count = db.execute('SELECT COUNT(id) FROM todo').fetchone()[0]
         assert count == 2
 
 def test_update(client, auth, app):
