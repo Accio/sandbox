@@ -3,3 +3,6 @@ run:
 
 init-db:
 	FLASK_APP=flasktd flask init-db
+
+test:
+	pytest
