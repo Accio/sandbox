@@ -82,3 +82,13 @@ def test_create_update_validate(client, auth, path):
     response = client.post(path, 
             data={'name':'', 'description': '', 'deadline':''})
     assert b'Name is required.' in response.data
+
+def test_delete(client, auth, app):
+    auth.login()
+    response = client.post('/1/delete')
+    assert response.headers['Location'] == 'http://localhost/'
+
+    with app.app_context():
+        db = get_db()
+        todo = db.execute('SELECT * FROM todo WHERE id = 1').fetchone()
+        assert todo is None
