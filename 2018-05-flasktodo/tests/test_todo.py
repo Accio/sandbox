@@ -11,7 +11,7 @@ def test_index(client, auth):
     assert b'Log Out' in response.data
     assert b'test todo' in response.data
     assert b'by test on 2018-01-01' in response.data
-    assert b'test\nbody' in response.data
+    assert b'test\ndescription' in response.data
     assert b'Deadline: 2018-05-12' in response.data
     assert b'href="/1/update"' in response.data
 
@@ -50,7 +50,7 @@ def test_create(client, auth, app):
     auth.login()
     assert client.get('/create').status_code == 200
     client.post('/create', data={'name':'created', 
-        'body': '', 
+        'description': '',
         'deadline': '2018-12-31'})
 
     with app.app_context():
@@ -63,7 +63,7 @@ def test_update(client, auth, app):
     assert client.get('/1/update').status_code == 200
     client.post('/1/update',
             data={'name': 'updated', 
-                'description': 'new desc', 
+                'description': 'new desc',
                 'deadline':'2018-06-01' })
 
     with app.app_context():
