@@ -7,4 +7,11 @@ init-db:
 test:
 	pytest
 
-.PHONY: test
+coverage:
+	coverage run -m pytest
+
+coverage-report:
+	coverage html
+	firefox ./htmlcov/index.html
+
+.PHONY: test coverage-report
