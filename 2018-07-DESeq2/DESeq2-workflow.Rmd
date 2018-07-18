@@ -1,0 +1,165 @@
+---
+title: "DESeq2 workflow"
+date: "`r Sys.date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(DESeq2)
+
+
+## parallelization
+library(BiocParallel)
+register(MulticoreParam(2))
+```
+
+This file documents the key steps of the DESeq2 workflow.
+
+# Standard workflow
+
+## Read in data and construct DESeqDataSet. It requires that the design matrix is given as formula; this requires that levels of factors in the pheno data (colData in the term of DESeq) are correctly ordered. Otherwise, comparisons will be wrong.
+
+```{r countMatrix}
+library("pasilla")
+pasCts <- system.file("extdata",
+                      "pasilla_gene_counts.tsv",
+                      package="pasilla", mustWork=TRUE)
+pasAnno <- system.file("extdata",
+                       "pasilla_sample_annotation.csv",
+                       package="pasilla", mustWork=TRUE)
+cts <- as.matrix(read.csv(pasCts,sep="\t",row.names="gene_id"))
+coldata <- read.csv(pasAnno, row.names=1)
+coldata <- coldata[,c("condition","type")]
+
+## subset/reorder samples to make sure that the rownames of coldata and colnames of column names are the same
+rownames(coldata) <- sub("fb", "", rownames(coldata))
+all(rownames(coldata) %in% colnames(cts))
+all(rownames(coldata) == colnames(cts))
+cts <- cts[, rownames(coldata)]
+all(rownames(coldata) == colnames(cts))
+
+## construct the DESeqDataSetFromMatrix object
+dds <- DESeqDataSetFromMatrix(countData = cts,
+                              colData = coldata,
+                              design = ~ condition)
+dds
+system.time(dds_rlog <- rlogTransformation(dds))
+```
+
+```{r summarizedExperimentInput, eval=FALSE}
+library(airway)
+data("airway")
+se <- airway ## a RangedSummarizedExperiment
+
+ddsSE <- DESeqDataSet(se, design=~cell+dex)
+ddsSE
+## it takes ~ 16s to log-transform data of 8 samples using rlogTransformation
+(timeCore2 <- system.time(ddSErlog <- rlogTransformation(ddsSE)))
+## Empirically we did not observe any acceleration of rlogTransformation by using 2 cores instead of 1
+## register(MulticoreParam(2))
+## (timeCore2 <- system.time(ddSErlog <- rlogTransformation(ddsSE)))
+## register(MulticoreParam(1))
+## (timeCore1 <- system.time(ddSErlog <- rlogTransformation(ddsSE)))
+```
+
+## Minimal filtering, keep rows that have at least 10 reads
+
+According to DESeq2 vignette, the more strict filtering is *automatically* applied via independent filtering on the mean of normalized counts within the results function.
+
+```{r minimalFiltering}
+keep <- rowSums(counts(dds)) >= 10
+dds <- dds[keep,]
+```
+
+## Relevel
+
+The reference level needs to be updated.
+```{r}
+dds$condition <- relevel(dds$condition, ref="untreated")
+```
+
+## Differential gene expression
+
+```{r}
+dds <- DESeq(dds)
+res <- results(dds)
+res
+```
+
+### Log-fold change shrinkage for visualization and ranking
+
+I don't understand it exactly yet why this step is needed or helpful. From reading, it seems that the step takes a prior of logFC distribution (centered at zero and scaled empirically by the data), and then calculate logFC MAP (maximum a posteriori), instead of logFC MLE (maximum liklihood).
+
+```{r shrinkage}
+resLFC <- lfcShrink(dds, coef="condition_treated_vs_untreated", type="apeglm")
+resLFC
+```
+
+### p-values and filtering of the top table
+
+```{r pVal}
+resOrdered <- res[order(res$pvalue),]
+summary(resOrdered)
+
+sigRse <- results(dds, alpha=0.05, lfcThreshold = 0.5)
+summary(sigRse)
+```
+
+### Independent hypothesis weighting (by Wolfgang and co.)
+
+Currently, I do not understand the benefit of this step. The results are quite similar when compared with the results without IHW.
+
+```{r ihw}
+library("IHW")
+resIHW <- results(dds, alpha=0.05, lfcThreshold = 0.5, filterFun=ihw)
+summary(resIHW)
+```
+
+## Visualizations
+
+```{r plotMA}
+plotMA(res, ylim=c(-2, 2))
+```
+
+It's more useful to visualize the MA plot for the shrunken log2FC, because it removes noise associated with low count genes.
+
+```{r plotMALFC}
+plotMA(resLFC, ylim=c(-2, 2))
+```
+
+### Plot counts
+
+```{r}
+d <- plotCounts(dds, gene=which.min(res$padj), intgroup="condition", 
+                returnData=TRUE)
+library("ggplot2")
+ggplot(d, aes(x=condition, y=count)) + 
+  geom_point(position=position_jitter(w=0.1,h=0)) + 
+  scale_y_log10(breaks=c(25,100,400)) 
+```
+
+### Rich visualizations
+
+Following tools can be used:
+
+* ReportingTools
+* regionReport
+* Glimma
+* pcaExplorer
+
+### Export results
+
+```{r}
+library(ribiosIO)
+writeMatrix(as.data.frame(resOrdered),
+          "condition_treated_results.tsv")
+```
+
+
+## Special notes
+For single-cell analysis, where the data better fits to a zero-inflated negative binomial (ZINB) distribution, rather than a negative binomial distribution.
+
+* One can use the zinbwave package to directly model the zero inflation of the counts, and take account of these in the DESeq2 model.
+* It is best to use test="LRT" for significance testing when working with single-cell data, over the Wald test. This has been observed across multiple single-cell benchmarks.
+* It is recommended to set the following DESeq arguments: sfType="poscounts", useT=TRUE, minmu=1e-6, and  minReplicatesForReplace=Inf.
