@@ -12,9 +12,9 @@ I observed following changes (sorted by the order in the code)
 * [Major] if `inter.gene.cor` is `NA` or `NULL`, `df.camera` is set as `Inf` (which is otherwise `G-2`) in case of using ranks
 * [Minor] `unscaledt` is set as `rep.int(0, G)` instead of `rep(0,n)`. The usage of `n` instead of `G` was probably a mistake in the `biosCamera`, which however does not affect the results because the vector is automatically extended.
 * [Minor] `ID` is used as name of `unscaledt`.
-* [Minor] If `use.ranks=TRUE`, `Stat` is assigned `modt`
-* [Major?] zscoreT uses `approx=TRUE`
-* [Minor] if `iset` is character, it is replaced by the index of IDs
+* [Minor] If `use.ranks=TRUE`, `Stat` is assigned `modt` directly without zscoreT transformation. It makes sense because zscoreT is anyway only a monotone transformation.
+* [Minor] zscoreT uses `approx=TRUE`. This will lead to maybe faster calculation of z-scores of t-distribution and numerically slightly different results, however, the major conclusions should not change much, I hope.
+* [Minor] if `iset` is character, it is replaced by the index of IDs. This allows not only integer indices specified as gene-sets, but also gene identifiers 
 * [Major] if `fixed.cor` is `TRUE`, `correlation` is set as `inter.gene.cor`, and `vif` is adjusted accordingly (`1+(m-1)*correlation`)
 * [Minor] If `fixed.cor` is `TRUE`, the output table has no column `Correlation`
 
