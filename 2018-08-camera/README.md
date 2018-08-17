@@ -19,3 +19,7 @@ I observed following changes (sorted by the order in the code)
 * [Minor] If `fixed.cor` is `TRUE`, the output table has no column `Correlation`
 
 SO the conclusion is that the functionality of biosCamera is highly comparable to camera, with the exception of the handling of inter-gene correlation. Otherwise, the only difference which may lead to a different result is the change in the parameters passed to `zscoreT`, which uses `approx=TRUE` now. Otherwise, the new version of camera improves the robustness of the code, which we shall try to recapitulate in the improved version of biosCamera.
+
+## Thoughts about `inter.gene.cor`
+
+With regard to `inter.gene.cor`, I am not fully comfortable with it, because the assumption that all gene-sets have a intergene correlation of 0.01 is too artificial I think. And even such priors can be useful, I think they should be based on data instead of being based on an arbitrarily chosen number. Alas, in the current implementation of camera.default, the `inter.gene.cor` is assigned uniformly to all gene-sets; a simple change though, can allow a gene-set-specific inter.gene.cor
